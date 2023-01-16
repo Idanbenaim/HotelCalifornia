@@ -16,19 +16,59 @@ def get_bookings_list():
 
 #### bookings management sys ###
 class Bookings:
-    ORDER_ID = 100
+    BOOKING_ID = int(100)
 
     def __init__(self):
         pass
 
-    #
-    #
-    # def book_room(self, guests, datefrom,
-    #               dateto):  # [orderID, CustID, RoomID, ArrivalDate, DepartureData, TotalPrice, orderTotal]
-    #     '''add room reservation to the bookings list
-    #     and return customer detail as a list '''
-    #     ORDER_ID += 1
-    #
+    def book_room(cust_id, room_number, arrival_date, departure_date):
+        """saves a new booking in the db and returns the booking info"""
+        bid = Bookings.BOOKING_ID
+        bid += 1
+
+        # get list of rooms
+        rooms = rm.Rooms.get_inventory()
+
+        # get room type
+        room_type = None
+        for room in rooms:
+            if room[0] == room_number:
+                room_type = room[1]
+                break
+
+        # get price per night for room type
+        room_prices = rm.Rooms.get_room_by_type()
+        cost_per_night = int(room_prices[room_type]['Price'])
+
+        # calculate total cost
+        arrival = datetime.strptime(arrival_date, '%Y-%m-%d')
+        departure = datetime.strptime(departure_date, '%Y-%m-%d')
+        num_nights = (departure - arrival).days
+        total_cost = num_nights * cost_per_night
+
+        # write booking to csv file
+        with open(bookings, 'a') as bl:
+            reservation = csv.writer(bl)
+            reservation.writerow([bid, cust_id, room_number, arrival_date, departure_date, cost_per_night, total_cost])
+
+        # return booking info as tuple
+        booking_info = (bid, cust_id, room_number, arrival_date, departure_date, cost_per_night, total_cost)
+        return booking_info
+
+        # inventory = rm.Rooms.get_inventory()
+        # room_type = inventory[room_number][1]
+        # room_info = get_room_by_type(room_type)
+        # cost_per_night = room_info[room_type]['Price']
+        # arrival_date_obj = datetime.strptime(arrival_date, '%Y-%m-%d')
+        # departure_date_obj = datetime.strptime(departure_date, '%Y-%m-%d')
+        # num_nights = (departure_date_obj - arrival_date_obj).days
+        # total_cost = cost_per_night * num_nights
+        # booking_info = (BOOKING_ID, cust_id, room_number, arrival_date, departure_date, cost_per_night, total_cost)
+        # with open('bookings_list.csv', 'a', newline='') as csvfile:
+        #     writer = csv.writer(csvfile)
+        #     writer.writerow(booking_info)
+        # return booking_info
+
     #
     # @book_room
     # def book_room_by_room_number(self, room_number, datefrom, dateto):
@@ -89,24 +129,3 @@ class Bookings:
             if room[0] not in booked_rooms:
                 available_rooms.append(room)
         return available_rooms
-
-    # def get_available_rooms_by_date(guests, datefrom, dateto):
-    #     '''return a list of all available rooms at a specified date range'''
-    #     booked = get_booked_rooms_by_date(datefrom, dateto)
-    #     inv = get
-    #     inventory()
-    #
-    #     # we substruct the booked rooms from the entire inventory of rooms
-    #     total_available = list(set(inv[0]) - set(booked[0]))
-    #
-    #     # We filter out rooms which are not suitable for the customer's party size
-    #     net_available = (net_available.remove[i] for i in total_available if i[2] <= guests)
-    #
-    #     # we count the number of available rooms from each type
-    #     count_basic = 0
-    #     count - deluxe = 0
-    #     count_suite = 0
-    #     for j in net_available:
-    #         count_basic += 1 if j[4] == 'basic'
-    #         count_deluxe += 1 if j
-    #
