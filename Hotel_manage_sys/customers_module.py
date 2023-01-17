@@ -1,10 +1,6 @@
 import csv
 import database
-from database import *
-
-
-# from database import cust_list # shows red line below the file name saying it cannot be found in __init__ but we dont understand which init is refered to and what should be done to fix it.
-
+# from database import *
 
 #### read file ####
 def get_customers_list(file_name):
@@ -13,7 +9,7 @@ def get_customers_list(file_name):
     return customers
 
 
-cust_list = get_customers_list('/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/cust_list.csv')
+# cust_list = get_customers_list('/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/cust_list.csv')
 
 
 #### customer management sys ###

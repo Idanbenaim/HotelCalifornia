@@ -4,11 +4,16 @@ from database import *
 import re
 from datetime import datetime
 import random
+import json
 import Hotel_manage_sys.rooms_module as rm
 import Hotel_manage_sys.customers_module as cm
 import Hotel_manage_sys.bookings_module as bm
 
+### Files ###
+room_types_list = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/room_types_list.json'
 
+
+### files-End ###
 def main_menu():
     while True:
         print("\n****************************************************")
@@ -102,9 +107,22 @@ def get_valid_dates():
 
 ### option 1 ###  """add validation for duplicate room numbers"""
 def add_room_cli():
-    '''add validation for duplicate room numbers'''
+    """add validation for duplicate room numbers"""
     room_number = input('Enter room number: ')
-    ##### Create a raise in case the room number exists in the list ###
+
+    def validate_room_number(rn):
+        """check if room number already exists in inventory"""
+        rooms = rm.Rooms.get_inventory()
+        duplicate = False
+        for room in rooms:
+            if room[0] == rn:
+                duplicate = True
+                break
+        if duplicate:
+            print("Room number already exists in inventory. Please enter a unique room number.")
+            add_room_cli()
+
+    validate_room_number(room_number)
     print('There are 3 room types:\n 1. Basic\n 2. Deluxe\n 3. Suite')
     room_type = input('Please select room type 1, 2, or 3: ')
     while True:
@@ -130,7 +148,21 @@ def add_room_cli():
 
 ### option 2 ###
 def add_customer_cli():
+    """"""
+    def validate_customer_id(ci):
+        """check if customer id already exists in customer list"""
+        customers = cm.Customers.get_cust_list()
+        duplicate = False
+        for cust in customers:
+            if cust[0] == ci:
+                duplicate = True
+                break
+        if duplicate:
+            print("Customer ID already exists in customer list. Try option 12 to find the customer by name")
+            main_menu()
+
     cust_id = input('Enter customer identification number: ')
+    validate_customer_id(cust_id)
     name = input("Enter customer's first and last name: ")
     address = input('Enter customer address: ')
     city = input('Enter customer city: ')
@@ -146,6 +178,8 @@ def add_customer_cli():
 ### option 3 ###
 def book_room_cli():
     """"""
+    rtl = room_types_list
+
     # show menu
     def book_room_by_type():
         """"""
@@ -157,19 +191,22 @@ def book_room_cli():
 
         # count and print number of rooms available for each room type
         room_types = {'Basic': 0, 'Deluxe': 0, 'Suite': 0}
-        for room in available_rooms:
+        for room in available_rooms[1:]:
             room_types[room[1]] += 1
         print("Number of rooms available for each type:")
         for room_type, count in room_types.items():
             print(f"{room_type}: {count}")
 
         # get room information by type
-        room_info = get_room_by_type_cli()
+        print_room_types(rtl)
 
-        # ask user to choose room type
-        room_type = input("What room type would you like to book? (Basic, Deluxe, Suite) ")
-        while room_type not in room_info:
-            room_type = input("Invalid room type. Please choose from: Basic, Deluxe, Suite ")
+        # get user to choose room type
+        print('There are 3 room types:\n 1. Basic\n 2. Deluxe\n 3. Suite')
+        room_type = input('Please enter the room type you would like to book (Basic, Deluxe, Suite): ')
+        while room_type not in ["Basic", "Deluxe", "Suite"]:
+            room_type = input("Invalid room type. Please enter Basic, Deluxe, or Suite: ")
+
+        # set one of the rooms from the selected type for booking
         rooms_of_selected_type = [room[0] for room in available_rooms if room[1] == room_type]
         room_number = random.choice(rooms_of_selected_type)
 
@@ -177,8 +214,7 @@ def book_room_cli():
         cust_id = is_existing_customer()
 
         # book room
-        booking = bm.Bookings.book_room(cust_id, room_number, arrival_date, departure_date)
-        print_booking(booking)
+        confirm_booking(cust_id, room_number, arrival_date, departure_date)
 
     def book_room_by_number():
         """"""
@@ -191,10 +227,11 @@ def book_room_cli():
         # get room number
         room_number = input("Please enter the room number you want to book: ")
         room_is_available = False
-        for room in available_rooms:
+        for room in available_rooms[1:]:
             if room[0] == room_number:
                 room_is_available = True
                 print("Great, that room is available in the selected dates!")
+
                 break
         if not room_is_available:
             print("Sorry, that room is not available for the selected dates.")
@@ -204,24 +241,52 @@ def book_room_cli():
         cust_id = is_existing_customer()
 
         # book room
-        booking = bm.Bookings.book_room(cust_id, room_number, arrival_date, departure_date)
-        print_booking(booking)
+        confirm_booking(cust_id, room_number, arrival_date, departure_date)
+
+    def print_room_types(room_type_list):
+        """prints the content of the json file in an organized way"""
+        with open(room_type_list) as json_file:
+            room_types_dict = json.load(json_file)
+
+        print('\n*** Here is the information about each room type: ***\n')
+        print("Type\tSize\tCapacity\tNumber of Beds\tPrice\tMinimum Nights")
+        for room_type, info in room_types_dict.items():
+            print("{}\t{}\t\t\t{}\t\t\t{}\t\t\t{}\t\t\t{}".format(info["Type"], info["size"], info["Capacity"],
+                                                                  info["NumberOfBeds"], info["Price"],
+                                                                  info["MinNights"]))
 
     def is_existing_customer():
         """ask if user is an existing customer"""
-        is_existing = input("Are you an existing customer? (yes/no) ")
-        if is_existing.lower() == "yes":
-            # find customer by name
-            customer = get_cust_by_name_cli()
-            cust_id = input("Please enter the customer's ID: ")
+        is_existing = input("Are you an existing customer? (yes/no): ")
+        # if is_existing.lower() == "yes":
+        if is_existing.lower() not in ["yes", "no", "y", "n"]:
+            print("Invalid answer. Please try again")
+            is_existing_customer()
+        # if customer exist find customer
+        elif is_existing.lower() in ["yes", "y"]:
+            get_cust_by_name_cli()
+            cust_id = input("Confirm booking:\nPlease enter the customer's ID to confirm booking: ")
+        # if customer does not exist add customer
         else:
-            # add new customer
+
             cust_id = add_customer_cli()
         return cust_id
 
+    def confirm_booking(cust_id, room_number, arrival_date, departure_date):
+        confirm = input("Do you want to book room {} for dates {} - {}? (yes/no): ".format(room_number, arrival_date,
+                                                                                          departure_date))
+        if confirm.lower() == "yes":
+            booking = bm.Bookings.book_room(cust_id, room_number, arrival_date, departure_date)
+            print_booking(booking)
+        elif confirm.lower() == "no":
+            main_menu()
+        else:
+            print("Invalid input. Please enter yes or no.")
+            confirm_booking(cust_id, room_number, arrival_date, departure_date)
+
     def print_booking(booking):
         """present booking confirmation"""
-        print("Booking confirmation:")
+        print("\n*****\nBooking confirmation:\n*****\n")
         print(f"Order ID: {booking[0]}")
         print(f"Customer ID: {booking[1]}")
         print(f"Room Number: {booking[2]}")
@@ -233,7 +298,7 @@ def book_room_cli():
     def book_room_menu():
         """"""
         while True:
-            print("What would you like to do?\n")
+            print("\nWhat would you like to do now?\n")
             print("1. book a room by type")
             print("2. Book a room by room number")
             print("3. Back to Main Menu")
@@ -252,12 +317,6 @@ def book_room_cli():
                 book_room_cli()
 
     book_room_menu()
-    # ask user if they want to book another room
-    another_room = input("Would you like to book another room? (yes/no) ")
-    if another_room.lower() == "yes":
-        book_room_menu()
-    else:
-        main_menu()
 
 
 ### option 4 ###
@@ -311,15 +370,15 @@ def remove_booking_cli():
 
 ### option 5 ###
 def get_inventory_cli():
-    rooms = rm.Rooms.get_inventory()  # calls the Hotel_manage_sys package > rooms_module.py > Rooms class > get_room_by_number() function and gets back the room info list from the csv
+    """calls the Hotel_manage_sys package > rooms_module.py > Rooms class > get_room_by_number() function and gets back the room info list from the csv"""
+    rooms = rm.Rooms.get_inventory()
     for room in rooms:
         print(room)
 
 
 ### option 6 ###
 def get_cust_list_cli():
-    """"""
-    # calls the Hotel_manage_sys package > customers_module.py > Customers class > get_cust_list() function and gets back the customer list
+    """calls the Hotel_manage_sys package > customers_module.py > Customers class > get_cust_list() function and gets back the customer list"""
     customers = cm.Customers.get_cust_list()
     for cust in customers:
         print(cust)
@@ -373,7 +432,8 @@ def get_room_by_type_cli():
     '''takes from the user the room type they want info about and prints the info about the room type'''
     types = rm.Rooms.get_room_by_type()  # calls the Hotel_manage_sys package > rooms_module.py > Rooms class > get_room_by_type() function and gets back the room types dict from the json
     print('There are 3 room types:\n 1. Basic\n 2. Deluxe\n 3. Suite')
-    room_type = input('Please select room type 1, 2, or 3: ')
+    room_type = input(
+        'Please enter 1, 2 or 3 to choose the type of room for which you would like to view additional details: ')
 
     def print_room(r):
         '''displays to the user the room type data'''
@@ -410,13 +470,17 @@ def get_room_by_type_cli():
 
 ### option 11 ###
 def get_room_by_number_cli():
-    '''takes from the user the room number they want info about and prints the info about the room number'''
-    rooms = rm.Rooms.get_inventory()  # calls the Hotel_manage_sys package > rooms_module.py > Rooms class > get_room_by_number() function and gets back the room info list from the csv
-    types = rm.Rooms.get_room_by_type()  # calls the Hotel_manage_sys package > rooms_module.py > Rooms class > get_room_by_type() function and gets back the room types dict from the json
+    """takes from the user the room number they want info about and prints the info about the room number"""
+    # call the Hotel_manage_sys package > rooms_module.py > Rooms class > get_room_by_number() function
+    # and get back the room info list from the csv
+    rooms = rm.Rooms.get_inventory()
+    # calls the Hotel_manage_sys package > rooms_module.py > Rooms class > get_room_by_type() function
+    # and gets back the room types dict from the json
+    types = rm.Rooms.get_room_by_type()
     room_number = input('Please enter the desired room number: ')
 
     def print_room(r):
-        '''displays to the user the room data'''
+        """displays to the user the room data"""
         print(f"here is the info you asked about room number {room_number}")
         print(f"Type: {r['Type']}")
         print(f"Size: {r['size']} sq. meters")
@@ -455,7 +519,7 @@ def get_room_by_number_cli():
 
 ### option 12 ###
 def get_cust_by_name_cli():
-    ''''''
+    """ """
     customer_name = input("Please enter the customer's first and last name: ")
     customers = cm.Customers.get_cust_list()
 
@@ -502,8 +566,8 @@ def get_cust_by_name_cli():
 
 ### option 13 ###
 def remove_room_cli():
-    '''calls get_room_by_number_cli,
-    then sends the removal request to the hotel management sys after confirmation'''
+    """calls get_room_by_number_cli,
+    then sends the removal request to the hotel management sys after confirmation"""
 
     def confirm_removal(num):
         confirm = input(f"Are you sure you want to remove room number {num}? Please enter Y / N: ")
@@ -518,7 +582,7 @@ def remove_room_cli():
 
             except ValueError as e:  # if error is raised we ask the user for the input again
                 print(e)  # Print the ValueError message
-                confirm = input(f"Would you like to remove room number {num}? Please enter Y / N: ")
+                confirm_removal(num)
 
             else:
                 #  when the input is 'Y' or 'y' we call the remove_room in the Hotel_manage_sys
@@ -570,7 +634,7 @@ def remove_cust_cli():
 
             except ValueError as e:  # if error is raised we ask the user for the input again
                 print(e)  # Print the ValueError message
-                confirm = input(f"Are you sure you want to remove customer ID {cust_id}? Please enter Y / N: ")
+                confirm_removal(cust_id)
 
             else:
                 #  when the input is 'Y' or 'y' we call the remove_customer in the Hotel_manage_sys

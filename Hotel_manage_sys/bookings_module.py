@@ -1,18 +1,14 @@
 import json
 import csv
 from datetime import datetime
+
+import database
+# from database import *
 from Hotel_manage_sys import rooms_module as rm, customers_module as cm
-from database import *
 
+
+#### files ###
 bookings = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/bookings_list.csv'
-
-
-#### read file ###
-def get_bookings_list():
-    with database.open('bookings_list.txt') as f:
-        bookings = f.read()
-    return bookings
-
 
 #### bookings management sys ###
 class Bookings:
@@ -55,35 +51,9 @@ class Bookings:
         booking_info = (bid, cust_id, room_number, arrival_date, departure_date, cost_per_night, total_cost)
         return booking_info
 
-        # inventory = rm.Rooms.get_inventory()
-        # room_type = inventory[room_number][1]
-        # room_info = get_room_by_type(room_type)
-        # cost_per_night = room_info[room_type]['Price']
-        # arrival_date_obj = datetime.strptime(arrival_date, '%Y-%m-%d')
-        # departure_date_obj = datetime.strptime(departure_date, '%Y-%m-%d')
-        # num_nights = (departure_date_obj - arrival_date_obj).days
-        # total_cost = cost_per_night * num_nights
-        # booking_info = (BOOKING_ID, cust_id, room_number, arrival_date, departure_date, cost_per_night, total_cost)
-        # with open('bookings_list.csv', 'a', newline='') as csvfile:
-        #     writer = csv.writer(csvfile)
-        #     writer.writerow(booking_info)
-        # return booking_info
 
-    #
-    # @book_room
-    # def book_room_by_room_number(self, room_number, datefrom, dateto):
-    #     '''book a specific room number'''
-    #     pass
-    #
-    #
-    # @book_room
-    # def book_room_by_room_type(self, room_number, datefrom, dateto):
-    #     '''book a specific room number'''
-    #     pass
-    #
-    #
     def remove_booking(booking_id):
-        '''cancel a future room reservation and remove from the bookings list'''
+        """cancel a future room reservation and remove from the bookings list"""
         global bookings
         with open(bookings, "r") as bl:
             csv_reader = csv.reader(bl)
