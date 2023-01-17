@@ -1,0 +1,26 @@
+{
+    "Basic": {
+        "Type": "Basic",
+        "size": "20",
+        "Capacity": "2",
+        "NumberOfBeds": "1",
+        "Price": "200",
+        "MinNights": "1"
+    },
+    "Deluxe": {
+        "Type": "Deluxe",
+        "size": "40",
+        "Capacity": "4",
+        "NumberOfBeds": "2",
+        "Price": "400",
+        "MinNights": "2"
+    },
+    "Suite": {
+        "Type": "Suite",
+        "size": "60",
+        "Capacity": "6",
+        "NumberOfBeds": "3",
+        "Price": "600",
+        "MinNights": "3"
+    }
+}
