@@ -34,7 +34,7 @@ def main_menu():
         print("12. Find customer by name")
         print("13. Remove room")
         print("14. Remove customer")
-        print("0. EXIT MANAGEMENT SYSTEM")
+
 
         main_menu_selection = int(input("\nPlease type the option number (0-14): "))
 
@@ -76,13 +76,13 @@ def main_menu():
         elif main_menu_selection == 14:
             remove_cust_cli()
         else:
-            print("Option not available. Please enter a valid number between 0-14 from the menu below")
+            print("Option not available. Please enter a valid number between 1-14 from the menu below")
             main_menu()
 
 
 ### date-check ###
 def get_valid_dates():
-    """"""
+    """validates the date format"""
     while True:
         arrival_date = input("Enter arrival date (YYYY-MM-DD) or 'X' to go back to main menu: ")
         if arrival_date.lower() == 'x':
@@ -148,7 +148,7 @@ def add_room_cli():
 
 ### option 2 ###
 def add_customer_cli():
-    """"""
+    """gets the customer information from the user and send it to the backend to be saved in the db"""
     def validate_customer_id(ci):
         """check if customer id already exists in customer list"""
         customers = cm.Customers.get_cust_list()
@@ -177,12 +177,11 @@ def add_customer_cli():
 
 ### option 3 ###
 def book_room_cli():
-    """"""
+    """gets the reservation dates and sets room reservations by room type or by room number """
     rtl = room_types_list
 
-    # show menu
     def book_room_by_type():
-        """"""
+        """provides information about the room types of the hotel and takes in a reservation"""
         # get valid dates for booking
         arrival_date, departure_date = get_valid_dates()
 
@@ -217,7 +216,7 @@ def book_room_cli():
         confirm_booking(cust_id, room_number, arrival_date, departure_date)
 
     def book_room_by_number():
-        """"""
+        """gets the desired room number and takes in a reservation"""
         # get valid dates for booking
         arrival_date, departure_date = get_valid_dates()
 
@@ -265,7 +264,7 @@ def book_room_cli():
         # if customer exist find customer
         elif is_existing.lower() in ["yes", "y"]:
             get_cust_by_name_cli()
-            cust_id = input("Confirm booking:\nPlease enter the customer's ID to confirm booking: ")
+            cust_id = input("\nPlease enter the customer's ID to confirm booking: ")
         # if customer does not exist add customer
         else:
 
@@ -273,6 +272,7 @@ def book_room_cli():
         return cust_id
 
     def confirm_booking(cust_id, room_number, arrival_date, departure_date):
+        """get confirmation from the user to book the room"""
         confirm = input("Do you want to book room {} for dates {} - {}? (yes/no): ".format(room_number, arrival_date,
                                                                                           departure_date))
         if confirm.lower() == "yes":
@@ -296,7 +296,7 @@ def book_room_cli():
         print(f"Total Cost: {booking[6]}")
 
     def book_room_menu():
-        """"""
+        """provides a menu options of reservation ways"""
         while True:
             print("\nWhat would you like to do now?\n")
             print("1. book a room by type")
@@ -321,19 +321,20 @@ def book_room_cli():
 
 ### option 4 ###
 def remove_booking_cli():
-    """"""
+    """gets the reservation details from the user and cancels the booking"""
 
     def remove_booking(booking_id):
-        """"""
+        """sends an api call to the back end to remove the reservation"""
         bm.Bookings.remove_booking(booking_id)
         print(f"Booking with ID {booking_id} has been cancelled.")
 
     def get_matching_bookings(customer_id, arrival_date, departure_date):
+        """gets all bookings from the provided dates and compare them to the customer ID"""
         booked_rooms = bm.Bookings.get_booked_rooms_by_date(arrival_date, departure_date)
         return [booking for booking in booked_rooms if booking[1] == customer_id]
 
     def print_matching_bookings(bookings):
-        """"""
+        """prints all possible bookings to help the user decide which to remove"""
         print("Below are the future bookings for the selected customer:")
         print("BOOKING ID| Customer ID| Room Number| Arrival Date| Departure Date| Cost per Night| Order Total Cost")
         for room in bookings:
@@ -386,7 +387,7 @@ def get_cust_list_cli():
 
 ### option 7 ###
 def get_all_bookings_cli():
-    """"""
+    """presents to the user the entire booking list"""
     booked_rooms = bm.Bookings.get_all_bookings()
     print("Booked Rooms in the specified date range:")
     print("Order ID| Customer ID| Room Number| Arrival Date| Departure Date| Cost per Night| Order Total Cost")
@@ -397,7 +398,7 @@ def get_all_bookings_cli():
 
 ### option 8 ###
 def get_booked_rooms_by_date_cli():
-    """"""
+    """presents to the user the booking list in the desired time frame"""
     arrival_date, departure_date = get_valid_dates()
     booked_rooms = bm.Bookings.get_booked_rooms_by_date(arrival_date, departure_date)
     if booked_rooms:
@@ -414,7 +415,7 @@ def get_booked_rooms_by_date_cli():
 
 ### option 9 ###
 def get_available_rooms_by_date_cli():
-    """"""
+    """presents to the user the list of available rooms in the desired time frame"""
     arrival_date, departure_date = get_valid_dates()
     available_rooms = bm.Bookings.get_available_rooms_by_date(arrival_date, departure_date)
     if available_rooms:
@@ -519,7 +520,7 @@ def get_room_by_number_cli():
 
 ### option 12 ###
 def get_cust_by_name_cli():
-    """ """
+    """presents to the user information about all customers with the entered name"""
     customer_name = input("Please enter the customer's first and last name: ")
     customers = cm.Customers.get_cust_list()
 
@@ -645,6 +646,3 @@ def remove_cust_cli():
     confirm_id = confirm_cust_id(customer_id)
     confirm_removal(confirm_id)
 
-
-def close_program_cli():
-    pass

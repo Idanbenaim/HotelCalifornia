@@ -3,24 +3,36 @@ import csv
 from datetime import datetime
 
 import database
-# from database import *
+# booking_id_file = database.booking_id_file
+
 from Hotel_manage_sys import rooms_module as rm, customers_module as cm
 
 
 #### files ###
 bookings = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/bookings_list.csv'
+booking_id_file = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/booking_id_file.txt'
+
 
 #### bookings management sys ###
 class Bookings:
     BOOKING_ID = int(100)
+    booking_id_file = 'booking_id_file.txt'
 
     def __init__(self):
         pass
 
+    def get_booking_id():
+        """generate a unique booking id"""
+        with open(booking_id_file, 'r') as bir:
+            BOOKING_ID = int(bir.read())
+        BOOKING_ID += 1
+        with open(booking_id_file, 'w') as biw:
+            biw.write(str(BOOKING_ID))
+        return BOOKING_ID
+
     def book_room(cust_id, room_number, arrival_date, departure_date):
         """saves a new booking in the db and returns the booking info"""
-        bid = Bookings.BOOKING_ID
-        bid += 1
+        bid = Bookings.get_booking_id()
 
         # get list of rooms
         rooms = rm.Rooms.get_inventory()

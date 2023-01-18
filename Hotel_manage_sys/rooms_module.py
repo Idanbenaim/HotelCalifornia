@@ -6,8 +6,8 @@ import database
 
 
 ### files ###
-
 rooms_list = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/rooms_list.csv'
+room_types = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/room_types_list.json'
 
 #### rooms management sys ####
 class Rooms:
@@ -19,7 +19,6 @@ class Rooms:
     def add_room(room_info:list):
         '''gets a room number and type from add_room_cli as a list.
         here we use the list to add the room's info to the rooms_list file'''
-        rooms_list = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/rooms_list.csv'
         with open(rooms_list, 'a', newline='') as rl:
             update_room_list = csv.writer(rl)
             if rl.tell() == 0:  # Check if the file is empty
@@ -28,7 +27,6 @@ class Rooms:
 
     def get_inventory():
         """returns the full rooms list"""
-        global rooms_list
         rooms = []
         with open(rooms_list, 'r') as rl:
             reader = csv.reader(rl)
@@ -37,19 +35,17 @@ class Rooms:
         return rooms
 
     def get_room_by_type():
-        # room_types = database.db_paths.room_types_list
-        room_types = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/room_types_list.json'
+        """returns the room types of the hotel in a dictionary format"""
         with open(room_types, 'r') as rt:
             types = json.load(rt)
         return types
 
     def remove_room(num):
         """receives the room number and removes it from the rooms list"""
-        rooms_list = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/rooms_list.csv'
         with open(rooms_list, "r") as rl:
             csv_reader = csv.reader(rl)
             rooms = list(csv_reader)
-        # print(num)
+
         for room in rooms:
             if room[0] == num:
                 rooms.remove(room)

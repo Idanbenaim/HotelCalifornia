@@ -3,13 +3,7 @@ import database
 # from database import *
 
 #### read file ####
-def get_customers_list(file_name):
-    with open(file_name) as f:
-        customers = f.read()
-    return customers
-
-
-# cust_list = get_customers_list('/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/cust_list.csv')
+cust_list = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/cust_list.csv'
 
 
 #### customer management sys ###
@@ -30,7 +24,6 @@ class Customers:
         """gets a customer info from add_customer_cli as a list.
     here we use the list to add the customer's info to the cust_list file"""
 
-        cust_list = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/cust_list.csv'
         with open(cust_list, 'a', newline='') as cl:
             writer = csv.writer(cl)
             if cl.tell() == 0:  # Check if the file is empty
@@ -39,8 +32,6 @@ class Customers:
 
     def get_cust_list():
         """returns the full customer list as list of lists"""
-        # global cust_list
-        cust_list = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/cust_list.csv'
         customers = []
         with open(cust_list, 'r') as cl:
             reader = csv.reader(cl)
@@ -50,11 +41,10 @@ class Customers:
 
     def remove_customer(cust_id):
         """receives the customer ID and removes it from the customes list"""
-        cust_list = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/cust_list.csv'
         with open(cust_list, "r") as cl:
             csv_reader = csv.reader(cl)
             customers = list(csv_reader)
-        # print(cust_id)
+
         for customer in customers:
             if customer[0] == cust_id:
                 customers.remove(customer)
@@ -63,8 +53,3 @@ class Customers:
                     csv_writer.writerows(customers)
                 break
 
-#
-# def __get_cust_by_name(self, name):
-#   '''returns a specific cusotmer's info'''
-#   raise 'No customer with that name'
-#   pass
