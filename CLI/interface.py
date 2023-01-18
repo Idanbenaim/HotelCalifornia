@@ -10,7 +10,7 @@ import Hotel_manage_sys.customers_module as cm
 import Hotel_manage_sys.bookings_module as bm
 
 ### Files ###
-room_types_list = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/room_types_list.json'
+room_types_list = '../database/room_types_list.json'
 
 
 ### files-End ###

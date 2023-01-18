@@ -9,8 +9,8 @@ from Hotel_manage_sys import rooms_module as rm, customers_module as cm
 
 
 #### files ###
-bookings = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/bookings_list.csv'
-booking_id_file = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/booking_id_file.txt'
+bookings = '../database/bookings_list.csv'
+booking_id_file = '../database/booking_id_file.txt'
 
 
 #### bookings management sys ###

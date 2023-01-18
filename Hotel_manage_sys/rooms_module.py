@@ -6,8 +6,8 @@ import database
 
 
 ### files ###
-rooms_list = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/rooms_list.csv'
-room_types = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/room_types_list.json'
+rooms_list = '../database/rooms_list.csv'
+room_types = '../database/room_types_list.json'
 
 #### rooms management sys ####
 class Rooms:
@@ -17,8 +17,8 @@ class Rooms:
         self.room_type = room_type
 
     def add_room(room_info:list):
-        '''gets a room number and type from add_room_cli as a list.
-        here we use the list to add the room's info to the rooms_list file'''
+        """gets a room number and type from add_room_cli as a list.
+        here we use the list to add the room's info to the rooms_list file"""
         with open(rooms_list, 'a', newline='') as rl:
             update_room_list = csv.writer(rl)
             if rl.tell() == 0:  # Check if the file is empty

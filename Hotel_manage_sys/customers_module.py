@@ -1,9 +1,9 @@
 import csv
 import database
-# from database import *
+
 
 #### read file ####
-cust_list = '/Users/idanbenaim/PycharmProjects/HotelCalifornia/database/cust_list.csv'
+cust_list = '../database/cust_list.csv'
 
 
 #### customer management sys ###
