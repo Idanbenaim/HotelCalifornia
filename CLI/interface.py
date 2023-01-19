@@ -80,8 +80,35 @@ def main_menu():
 
 
 ### date-check ###
+# def get_valid_dates():
+#     """validates the date format, arrival date as future date,
+#     and at least 1 night from arrival to departure"""
+#     while True:
+#         arrival_date = input("Enter arrival date (YYYY-MM-DD) or 'X' to go back to main menu: ")
+#         if arrival_date.lower() == 'x':
+#             main_menu()
+#             break
+#         departure_date = input("Enter departure date (YYYY-MM-DD) or 'X' to go back to main menu: ")
+#         if departure_date.lower() == 'x':
+#             main_menu()
+#             break
+#         try:
+#             arrival_date_input = datetime.strptime(arrival_date, '%Y-%m-%d')
+#             departure_date_input = datetime.strptime(departure_date, '%Y-%m-%d')
+#             if arrival_date_input >= departure_date_input:
+#                 print("Arrival date must be prior to the departure date. Please enter the dates again.")
+#                 continue
+#         except ValueError:
+#             print("Invalid date format. Please enter the dates in the format YYYY-MM-DD.")
+#             continue
+#         break
+#     return arrival_date, departure_date
+
+
+import datetime
+
 def get_valid_dates():
-    """validates the date format"""
+    """validates the date format and ensures that the arrival date is not in the past"""
     while True:
         arrival_date = input("Enter arrival date (YYYY-MM-DD) or 'X' to go back to main menu: ")
         if arrival_date.lower() == 'x':
@@ -92,9 +119,13 @@ def get_valid_dates():
             main_menu()
             break
         try:
-            arrival_date_input = datetime.strptime(arrival_date, '%Y-%m-%d')
-            departure_date_input = datetime.strptime(departure_date, '%Y-%m-%d')
-            if arrival_date_input >= departure_date_input:
+            arrival_date_input = datetime.datetime.strptime(arrival_date, '%Y-%m-%d')
+            departure_date_input = datetime.datetime.strptime(departure_date, '%Y-%m-%d')
+            today = datetime.datetime.now()
+            if arrival_date_input <= today:
+                print("Arrival date can be made only for future dates. Please enter a valid date.")
+                continue
+            elif arrival_date_input >= departure_date_input:
                 print("Arrival date must be prior to the departure date. Please enter the dates again.")
                 continue
         except ValueError:
