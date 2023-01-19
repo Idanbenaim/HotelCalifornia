@@ -35,7 +35,6 @@ def main_menu():
         print("13. Remove room")
         print("14. Remove customer")
 
-
         main_menu_selection = int(input("\nPlease type the option number (0-14): "))
 
         if main_menu_selection == 1:
@@ -95,7 +94,7 @@ def get_valid_dates():
         try:
             arrival_date_input = datetime.strptime(arrival_date, '%Y-%m-%d')
             departure_date_input = datetime.strptime(departure_date, '%Y-%m-%d')
-            if arrival_date_input > departure_date_input:
+            if arrival_date_input >= departure_date_input:
                 print("Arrival date must be prior to the departure date. Please enter the dates again.")
                 continue
         except ValueError:
@@ -149,6 +148,7 @@ def add_room_cli():
 ### option 2 ###
 def add_customer_cli():
     """gets the customer information from the user and send it to the backend to be saved in the db"""
+
     def validate_customer_id(ci):
         """check if customer id already exists in customer list"""
         customers = cm.Customers.get_cust_list()
@@ -205,6 +205,14 @@ def book_room_cli():
         while room_type not in ["Basic", "Deluxe", "Suite"]:
             room_type = input("Invalid room type. Please enter Basic, Deluxe, or Suite: ")
 
+        # confirm available rooms in the selected room type
+        if room_types[room_type] == 0:
+            print('No available rooms for this type. Please start over.')
+            book_room_menu()
+
+        # confirm min nights
+        check_min_nights(arrival_date, departure_date, room_type, rtl)
+
         # set one of the rooms from the selected type for booking
         rooms_of_selected_type = [room[0] for room in available_rooms if room[1] == room_type]
         room_number = random.choice(rooms_of_selected_type)
@@ -228,13 +236,19 @@ def book_room_cli():
         room_is_available = False
         for room in available_rooms[1:]:
             if room[0] == room_number:
+                room_type = room[1]
                 room_is_available = True
+                # confirm min nights
+                check_min_nights(arrival_date, departure_date, room_type, rtl)
                 print("Great, that room is available in the selected dates!")
-
                 break
+
         if not room_is_available:
             print("Sorry, that room is not available for the selected dates.")
             book_room_menu()
+
+        # confirm min nights
+        # check_min_nights(arrival_date, departure_date, room_type, rtl)
 
         # find or create a customer
         cust_id = is_existing_customer()
@@ -253,6 +267,19 @@ def book_room_cli():
             print("{}\t{}\t\t\t{}\t\t\t{}\t\t\t{}\t\t\t{}".format(info["Type"], info["size"], info["Capacity"],
                                                                   info["NumberOfBeds"], info["Price"],
                                                                   info["MinNights"]))
+
+    def check_min_nights(arrival_date, departure_date, room_type, room_types_list):
+        arrival_date = datetime.strptime(arrival_date, '%Y-%m-%d')
+        departure_date = datetime.strptime(departure_date, '%Y-%m-%d')
+        num_nights = (departure_date - arrival_date).days
+        if room_type == 'Deluxe' and num_nights < 2:
+            print(f"*** \nThe selected room type requires a minimum stay of 2 nights. \nplease start over.\n***")
+            book_room_menu()
+        elif room_type == 'Suite' and num_nights < 3:
+            print(f"\n*** \nThe selected room type requires a minimum stay of 3 nights. \nplease start over.\n***")
+            book_room_menu()
+        else:
+            pass
 
     def is_existing_customer():
         """ask if user is an existing customer"""
@@ -274,7 +301,7 @@ def book_room_cli():
     def confirm_booking(cust_id, room_number, arrival_date, departure_date):
         """get confirmation from the user to book the room"""
         confirm = input("Do you want to book room {} for dates {} - {}? (yes/no): ".format(room_number, arrival_date,
-                                                                                          departure_date))
+                                                                                           departure_date))
         if confirm.lower() == "yes":
             booking = bm.Bookings.book_room(cust_id, room_number, arrival_date, departure_date)
             print_booking(booking)
@@ -450,7 +477,7 @@ def get_room_by_type_cli():
         try:  # checks if the input is correct and if not raise an exception
             if room_type != '1' and room_type != '2' and room_type != '3':
                 raise ValueError(
-                    "\n********************************\n Wrong Value! Please enter 1, 2, or 3.\n********************************\n")
+                    "\n******\n Wrong Value! Please enter 1, 2, or 3.\n******\n")
         except ValueError as e:  # if error is raised we ask the user for the input again
             print(e)  # Print the ValueError message
             print('There are 3 room types.\n 1. Basic\n 2. Deluxe\n 3. Suite')
@@ -561,6 +588,7 @@ def get_cust_by_name_cli():
             if not found:
                 # If the customer's name is not in our list, print result
                 print("** No customer with that name. To add the customer select option 1 on the main menu **")
+                main_menu()
         break
     return cust_name
 
@@ -645,4 +673,3 @@ def remove_cust_cli():
 
     confirm_id = confirm_cust_id(customer_id)
     confirm_removal(confirm_id)
-
