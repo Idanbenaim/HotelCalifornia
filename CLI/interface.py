@@ -2,7 +2,8 @@
 and the back end in the Hotel_manage_sys package"""
 from database import *
 import re
-from datetime import datetime
+import datetime
+# from datetime import datetime
 import random
 import json
 import Hotel_manage_sys.rooms_module as rm
@@ -105,8 +106,6 @@ def main_menu():
 #     return arrival_date, departure_date
 
 
-import datetime
-
 def get_valid_dates():
     """validates the date format and ensures that the arrival date is not in the past"""
     while True:
@@ -140,12 +139,12 @@ def add_room_cli():
     """add validation for duplicate room numbers"""
     room_number = input('Enter room number: ')
 
-    def validate_room_number(rn):
+    def validate_room_number(room_number):
         """check if room number already exists in inventory"""
         rooms = rm.Rooms.get_inventory()
         duplicate = False
         for room in rooms:
-            if room[0] == rn:
+            if room[0] == room_number:
                 duplicate = True
                 break
         if duplicate:
@@ -300,8 +299,8 @@ def book_room_cli():
                                                                   info["MinNights"]))
 
     def check_min_nights(arrival_date, departure_date, room_type, room_types_list):
-        arrival_date = datetime.strptime(arrival_date, '%Y-%m-%d')
-        departure_date = datetime.strptime(departure_date, '%Y-%m-%d')
+        arrival_date = datetime.datetime.strptime(arrival_date, '%Y-%m-%d')
+        departure_date = datetime.datetime.strptime(departure_date, '%Y-%m-%d')
         num_nights = (departure_date - arrival_date).days
         if room_type == 'Deluxe' and num_nights < 2:
             print(f"*** \nThe selected room type requires a minimum stay of 2 nights. \nplease start over.\n***")

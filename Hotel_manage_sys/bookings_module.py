@@ -3,19 +3,18 @@ import csv
 from datetime import datetime
 
 import database
-# booking_id_file = database.booking_id_file
-
 from Hotel_manage_sys import rooms_module as rm, customers_module as cm
 
 
 #### files ###
 bookings = '../database/bookings_list.csv'
 booking_id_file = '../database/booking_id_file.txt'
+room_types_list = '../database/room_types_list.json'
 
 
 #### bookings management sys ###
 class Bookings:
-    BOOKING_ID = int(100)
+    BOOKING_ID = int(1000)
     booking_id_file = 'booking_id_file.txt'
 
     def __init__(self):
@@ -32,6 +31,7 @@ class Bookings:
 
     def book_room(cust_id, room_number, arrival_date, departure_date):
         """saves a new booking in the db and returns the booking info"""
+        # get a new booking ID
         bid = Bookings.get_booking_id()
 
         # get list of rooms
@@ -44,9 +44,9 @@ class Bookings:
                 room_type = room[1]
                 break
 
-        # get price per night for room type
-        room_prices = rm.Rooms.get_room_by_type()
-        cost_per_night = int(room_prices[room_type]['Price'])
+        # get price per night for the room type
+        room_types_json = rm.Rooms.get_room_by_type()
+        cost_per_night = int(room_types_json[room_type]['Price'])
 
         # calculate total cost
         arrival = datetime.strptime(arrival_date, '%Y-%m-%d')
