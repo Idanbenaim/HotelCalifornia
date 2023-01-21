@@ -1,9 +1,7 @@
 cust_id,name,address,city,email,age
-1,John Doe,123 Main St,Anytown,john.doe@example.com,30
-2,Jane Smith,456 Park Ave,Anycity,jane.smith@example.com,25
 753,Jennifer Simms,987 Floribunda Ave,Foster City,me@yopmail.com,54
 987,Gal Be,456 Main Street,Chicago,GB@yopmail.com,83
 324,Joe Bishop,321 Sunset Rd.,West Palm Beach,joe@yopmail.com,24
-1,John Doe,123 Main St,Anytown,john.doe@example.com,30
 123,or zyl,456 nowhere st,nocity,noemail@yopmail.com,22
 234,oren zylber,436 somewhere,anycity,or@yopmail.com,23
+246,Ori Zyl,999 doors room,foster city,999@yopmail.com,43

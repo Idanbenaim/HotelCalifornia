@@ -1,14 +1,13 @@
 """this module bridges between the front end
 and the back end in the Hotel_manage_sys package"""
-from database import *
 import re
 import datetime
-# from datetime import datetime
 import random
 import json
 import Hotel_manage_sys.rooms_module as rm
 import Hotel_manage_sys.customers_module as cm
 import Hotel_manage_sys.bookings_module as bm
+
 
 ### Files ###
 room_types_list = '../database/room_types_list.json'
@@ -16,6 +15,7 @@ room_types_list = '../database/room_types_list.json'
 
 ### files-End ###
 def main_menu():
+    """"""
     while True:
         print("\n****************************************************")
         print("   Welcome to Hotel California Management System!")
@@ -79,31 +79,6 @@ def main_menu():
             print("Option not available. Please enter a valid number between 1-14 from the menu below")
             main_menu()
 
-
-### date-check ###
-# def get_valid_dates():
-#     """validates the date format, arrival date as future date,
-#     and at least 1 night from arrival to departure"""
-#     while True:
-#         arrival_date = input("Enter arrival date (YYYY-MM-DD) or 'X' to go back to main menu: ")
-#         if arrival_date.lower() == 'x':
-#             main_menu()
-#             break
-#         departure_date = input("Enter departure date (YYYY-MM-DD) or 'X' to go back to main menu: ")
-#         if departure_date.lower() == 'x':
-#             main_menu()
-#             break
-#         try:
-#             arrival_date_input = datetime.strptime(arrival_date, '%Y-%m-%d')
-#             departure_date_input = datetime.strptime(departure_date, '%Y-%m-%d')
-#             if arrival_date_input >= departure_date_input:
-#                 print("Arrival date must be prior to the departure date. Please enter the dates again.")
-#                 continue
-#         except ValueError:
-#             print("Invalid date format. Please enter the dates in the format YYYY-MM-DD.")
-#             continue
-#         break
-#     return arrival_date, departure_date
 
 
 def get_valid_dates():
@@ -430,16 +405,22 @@ def remove_booking_cli():
 def get_inventory_cli():
     """calls the Hotel_manage_sys package > rooms_module.py > Rooms class > get_room_by_number() function and gets back the room info list from the csv"""
     rooms = rm.Rooms.get_inventory()
-    for room in rooms:
-        print(room)
+    print("List of rooms:")
+    print("Room Number | room Type")
+    for room in rooms[1:]:
+        print("\t{}\t\t| {}\t\t".format(room[0], room[1]))
 
 
 ### option 6 ###
 def get_cust_list_cli():
     """calls the Hotel_manage_sys package > customers_module.py > Customers class > get_cust_list() function and gets back the customer list"""
     customers = cm.Customers.get_cust_list()
-    for cust in customers:
-        print(cust)
+    print("customer list:")
+    print("Customer ID |  Full Name  |    Address    |  City  |    Email    |   Age")
+    for cust in customers[1:]:
+        print("{}\t\t| {}\t\t | {}\t| {}\t| {}\t| {}\t\t\t".format(cust[0], cust[1], cust[2], cust[3],
+                                                                       cust[4], cust[5]))
+
 
 
 ### option 7 ###
@@ -597,7 +578,7 @@ def get_cust_by_name_cli():
 
         except ValueError as e:  # if error is raised we ask the user for the input again
             print(e)  # Print the ValueError message
-            customer_name = input("Please enter the customer's first and last name: ")
+            get_cust_by_name_cli()
 
         else:
             #  when the input is correct we compare the input name to names in the database

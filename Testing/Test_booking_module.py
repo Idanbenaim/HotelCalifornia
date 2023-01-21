@@ -1,18 +1,6 @@
-import csv
-import json
-import re
-import random
-import datetime
-from datetime import datetime
-from unittest.mock import patch
-
-import CLI
-import database
-import Hotel_manage_sys
 import Hotel_manage_sys.rooms_module as rm
-import Hotel_manage_sys.customers_module as cm
 import Hotel_manage_sys.bookings_module as bm
-import CLI.interface as cli
+
 
 ### read files ###
 cust_list = '../database/cust_list.csv'
@@ -23,6 +11,7 @@ booking_id_file = '../database/booking_id_file.txt'
 
 
 def test_get_booking_id():
+    """set two booking ids and confirm they don't match"""
     # Test case 1: Check if the function returns a unique booking ID
     with open(booking_id_file, 'w') as bir:
         bir.write('1001')

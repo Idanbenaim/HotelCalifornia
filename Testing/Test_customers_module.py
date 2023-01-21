@@ -1,18 +1,6 @@
-import csv
-import json
-import re
-import random
-import datetime
-from datetime import datetime
-from unittest.mock import patch
 
-import CLI
-import database
-import Hotel_manage_sys
-import Hotel_manage_sys.rooms_module as rm
 import Hotel_manage_sys.customers_module as cm
-import Hotel_manage_sys.bookings_module as bm
-import CLI.interface as cli
+
 
 ### read files ###
 cust_list = '../database/cust_list.csv'
@@ -24,103 +12,87 @@ booking_id_file = '../database/booking_id_file.txt'
 
 def test_add_cust():
     """Test adding a customer"""
-    cust_info = [1, 'John Doe', '123 Main St', 'Anytown', 'john.doe@example.com', 30]
+
+    cust_id = '1'
+    name = 'John Doe'
+    address = '123 Main St'
+    city = 'Anytown'
+    email = 'john.doe@example.com'
+    age = '30'
+
+
+    cust_info = [cust_id, name, address, city, email, age]
     cm.Customers.add_cust(cust_info)
     with open(cust_list, 'r') as cl:
-        if cl.tell() == 0:
-            print("file is empty")
-        else:
-            reader = csv.reader(cl)
-            # Assert that the first row (column names) is correct
-            assert next(reader) == ['cust_id', 'name', 'address', 'city', 'email', 'age']
-            # Assert that the second row (customer info) is correct
-            row = next(reader)
-            assert row[0] == cust_info[0]
-            assert row[1] == cust_info[1]
-            assert row[2] == cust_info[2]
-            assert row[3] == cust_info[3]
-            assert row[4] == cust_info[4]
-            assert row[5] == cust_info[5]
-    # Test adding multiple customers
-    cust_info2 = [2, 'Jane Smith', '456 Park Ave', 'Anycity', 'jane.smith@example.com', 25]
-    cm.Customers.add_cust(cust_info2)
-    with open(cust_list, 'r') as cl:
-        if cl.tell() == 0:
-            print("file is empty")
-        else:
-            reader = csv.reader(cl)
-            # Assert that the first row (column names) is correct
-            assert next(reader) == ['cust_id', 'name', 'address', 'city', 'email', 'age']
-            # Assert that the second row (customer info) is correct
-            row = next(reader)
-            assert row[0] == cust_info[0]
-            assert row[1] == cust_info[1]
-            assert row[2] == cust_info[2]
-            assert row[3] == cust_info[3]
-            assert row[4] == cust_info[4]
-            assert row[5] == cust_info[5]
-            # Assert that the third row (customer info) is correct
-            row = next(reader)
-            assert row[0] == cust_info2[0]
-            assert row[1] == cust_info2[1]
-            assert row[2] == cust_info2[2]
-            assert row[3] == cust_info2[3]
-            assert row[4] == cust_info2[4]
-            assert row[5] == cust_info2[5]
+        customer_info = []
+        for customer in cl:
+            customer = customer.split(',')
+            if customer[0] == cust_id:
+                customer_info = customer
+                break
+
+        # Assert that the customer info is correct
+        assert customer_info[0] == cust_info[0]
+        assert customer_info[1] == cust_info[1]
+        assert customer_info[2] == cust_info[2]
+        assert customer_info[3] == cust_info[3]
+        assert customer_info[4] == cust_info[4]
+        assert customer_info[5].strip() == cust_info[5]
 
 
 def test_get_cust_list():
+    """set a customer into the customer list, get the customer list and find the customer we just added"""
+
     # Add a customer to the customer list
-    cust_info = [1, 'John Doe', '123 Main St', 'Anytown', 'john.doe@example.com', 30]
+    cust_id = '2'
+    name = 'Jane Smith'
+    address = '456 Park Ave'
+    city = 'Anycity'
+    email = 'jane.smith@example.com'
+    age = '25'
+
+    cust_info = [cust_id, name, address, city, email, age]
     cm.Customers.add_cust(cust_info)
-    # Add a second customer to the customer list
-    cust_info2 = [2, 'Jane Smith', '456 Park Ave', 'Anycity', 'jane.smith@example.com', 25]
-    cm.Customers.add_cust(cust_info2)
+
+
     # Get the full customer list
     with open(cust_list, 'r') as cl:
-        if cl.tell() == 0:
-            print("file is empty")
-        else:
-            customers = cm.Customers.get_cust_list()
-            # Assert that the first element of the customer list is the column names
-            assert customers[0] == ['cust_id', 'name', 'address', 'city', 'email', 'age']
-            # Assert that the second element of the customer list is the first customer's info
-            assert customers[1][0] == cust_info[0]
-            assert customers[1][1] == cust_info[1]
-            assert customers[1][2] == cust_info[2]
-            assert customers[1][3] == cust_info[3]
-            assert customers[1][4] == cust_info[4]
-            assert customers[1][5] == cust_info[5]
-            # Assert that the third element of the customer list is the second customer's info
-            assert customers[2][0] == cust_info2[0]
-            assert customers[2][1] == cust_info2[1]
-            assert customers[2][2] == cust_info2[2]
-            assert customers[2][3] == cust_info2[3]
-            assert customers[2][4] == cust_info2[4]
-            assert customers[2][5] == cust_info2[5]
+        customers = cm.Customers.get_cust_list()
+
+        # Assert that the information in the customer list matches the info added to the list
+        customer_info = []
+        for customer in cl:
+            customer = customer.split(',')
+            if customer[0] == cust_id:
+                customer_info = customer
+                break
+        assert customer_info[0] == cust_info[0]
+        assert customer_info[1] == cust_info[1]
+        assert customer_info[2] == cust_info[2]
+        assert customer_info[3] == cust_info[3]
+        assert customer_info[4] == cust_info[4]
+        assert customer_info[5].strip() == cust_info[5]
+
 
 def test_remove_customer():
+    """add a customer to the list, remove the customer, then confirm it is not in it"""
     # Add a customer to the customer list
-    cust_info = [1, 'John Doe', '123 Main St', 'Anytown', 'john.doe@example.com', 30]
-    cm.Customers.add_cust(cust_info)
-    # Add a second customer to the customer list
-    cust_info2 = [2, 'Jane Smith', '456 Park Ave', 'Anycity', 'jane.smith@example.com', 25]
-    cm.Customers.add_cust(cust_info2)
-    # Remove the first customer from the customer list
-    with open(cust_list, 'r') as cl:
-        if cl.tell() == 0:
-            print("file is empty")
-        else:
-            cm.Customers.remove_customer('1')
-            customers = cm.Customers.get_cust_list()
-            # Assert that the first element of the customer list is the column names
-            assert customers[0] == ['cust_id', 'name', 'address', 'city', 'email', 'age']
-            # Assert that the second element of the customer list is the second customer's info
-            assert customers[1][0] == cust_info2[0]
-            assert customers[1][1] == cust_info2[1]
-            assert customers[1][2] == cust_info2[2]
-            assert customers[1][3] == cust_info2[3]
-            assert customers[1][4] == cust_info2[4]
-            assert customers[1][5] == cust_info2[5]
+    cust_id = '1'
+    name = 'John Doe'
+    address = '123 Main St'
+    city = 'Anytown'
+    email = 'john.doe@example.com'
+    age = '30'
 
-# test_main_menu()
+    cust_info = [cust_id, name, address, city, email, age]
+    cm.Customers.add_cust(cust_info)
+
+    # Remove customer from the customer list
+    cust_list = cm.Customers.get_cust_list()
+    cm.Customers.remove_customer(cust_id)
+    # read the list again and confirm the customer was removed
+    cust_list = cm.Customers.get_cust_list()
+    assert cust_id not in [cust[0] for cust in cust_list]
+
+
+

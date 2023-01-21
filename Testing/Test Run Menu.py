@@ -1,18 +1,8 @@
-# import csv
-# import json
-# import re
-# import random
-# import datetime
-# from datetime import datetime
-# from unittest.mock import patch
-#
-# import CLI
-# import database
-# import Hotel_manage_sys
+
 import Testing.Test_rooms_module as rm
 import Testing.Test_customers_module as cm
 import Testing.Test_booking_module as bm
-# import CLI.interface as cli
+
 
 ### read files ###
 cust_list = '../database/cust_list.csv'
@@ -24,6 +14,9 @@ booking_id_file = '../database/booking_id_file.txt'
 
 ## Tests Menu ##
 def test_main_menu():
+    """below are the list of tests for the Hotel California project.
+    Run the module to start testing."""
+
     while True:
         print("\n****************************************************")
         print("   Welcome to Hotel California Testing System!")
